@@ -1,0 +1,11 @@
+p {
+    margin-bottom: 0;    
+}
+
+button {
+    border-radius: 100px; /* Ajusta el valor según el grado de redondeo que desees */
+}
+
+br {
+    margin: 1cm;
+}
