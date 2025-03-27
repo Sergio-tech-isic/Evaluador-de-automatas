@@ -44,13 +44,36 @@ function verifyAutomata(automata){
         }
     }); 
 
-    //Verificar estado inicial
-    //aqui ha y aasdlfkjsdalf
+    //Verificar estado inicial considerando que solo puede haber un estado inicial y que este debe estar en los estados
+    if(!automata.states.includes(automata.initialState )){
+        error = "Error el estado inicial no se encuentra en los estados";
+    }
 
-    //Verificar estados finales
+
+    //Verificar estados finales considerando que este debe estar en los estados
+    automata.finalStates.forEach(element => {
+        if(!automata.states.includes(element)){
+            error = "Error un estado final no se encuentra en los estados";
+        }
+    });
 
 
-    //Verificar transiciones
+    //Verificar transiciones considerando que los estados de origen y destino deben estar en los estados y los caracteres de transicion deben estar en el alfabeto
+    automata.transitions.forEach(element => {
+
+        if(!automata.states.includes(element[0])){
+            error = `Error: el estado de origen '${element[0]}' no se encuentra en los estados`;
+        }
+        
+        else 
+        if (!(automata.alphabet.includes(element[1]) || element[1] === '' || element[1] === "ε" || element[1] === "E" || element[1] === "")){
+            error =  `Error: el carácter de transición '${element[1]}' no se encuentra en el alfabeto`;
+        }
+        
+        else if(!(automata.states.includes(element[2]) || element[2] === "-")){
+            error = `Error: el estado de destino '${element[2]}' no se encuentra en los estados`;
+        }
+    });
 
     return error;
 
@@ -86,16 +109,28 @@ class FiniteAutomaton {
         this.transitions[fromState][symbol] ??= [];
         this.transitions[fromState][symbol].push(toState);   
     }
+    // modificar para soportar Transiciones con Épsilon y con Estados de error de un automata finito
+
 
     evaluateStr(str, currentState = this.initial, currentIndex = 0) {    
         if (currentIndex >= str.length) {
+            // Check if the current state is a final state
             return this.finalStates.includes(currentState);
         }
 
-        const possibleTransitions = this.transitions[currentState]?.[str[currentIndex]] || [];
+        // Handle epsilon transitions (transitions with symbol 'ε')
+        const epsilonTransitions = this.transitions[currentState]?.['ε'] || [];
+        const epsilonResult = epsilonTransitions.some(nextState => 
+            this.evaluateStr(str, nextState, currentIndex)
+        );
+        if (epsilonResult) {
+            return true;
+        }
 
+        // Handle normal transitions
+        const possibleTransitions = this.transitions[currentState]?.[str[currentIndex]] || [];
         return possibleTransitions.some(nextState => 
-            this.transitions[nextState] && this.evaluateStr(str, nextState, currentIndex + 1)
+            this.evaluateStr(str, nextState, currentIndex + 1)
         );
     }
 
@@ -108,3 +143,4 @@ class FiniteAutomaton {
     }
     
 }
+
