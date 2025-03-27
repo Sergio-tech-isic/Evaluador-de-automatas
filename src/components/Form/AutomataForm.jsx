@@ -7,20 +7,17 @@ export default function AutomataForm() {
     const [states, setStates] = useState("q0,q1,q2,q3");
     const [initialState, setInitialState] = useState("q0");
     const [finalStates, setFinalStates] = useState("q2,q3");
-    const [transitions, setTransitions] = useState(
-        [   "q0,a,q1",
-            "q0,a,q3",
-            "q0,b,-",
-            "q1,a,-",
-            "q1,b,q2",
-            "q2,a,q1",
-            "q2,b,-",
-            "q3,a,-",
-            "q3,b,q3"
-        ]);
-
-    
-
+    const [transitions, setTransitions] = useState([
+        "q0,a,q1",
+        "q0,a,q3",
+        "q0,b,-",
+        "q1,a,-",
+        "q1,b,q2",
+        "q2,a,q1",
+        "q2,b,-",
+        "q3,a,-",
+        "q3,b,q3"
+    ]);
 
     const [strings, setStrings] = useState(["a","b","ab","abbbb","ba","ababab","abababa"]);
     const [content, setContent] = useState("");
@@ -33,8 +30,10 @@ export default function AutomataForm() {
             states: states.split(",").map((s) => s.trim()),
             initialState: initialState.trim(),
             finalStates: finalStates.split(",").map((f) => f.trim()),
-            transitions
-            
+            transitions: transitions.map(t => {
+                const [from, symbol, to] = t.split(",");
+                return [from.trim(), symbol.trim(), to.trim()];
+            })
         };
         setContent(<Result automata={automata} cadenas={strings}  />)
 
@@ -74,10 +73,9 @@ export default function AutomataForm() {
 
     return (
         <div>
-            <div style={{ maxWidth: "400px", margin: "20px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "10px" }}>
-                <h2 style={{ textAlign: "center" }}>Ingrese el Automata</h2>
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-
+            <div className="container">
+            <h2 className="title">Ingrese el Automata</h2>
+            <form onSubmit={handleSubmit} className="form">
                     <p>Alfabeto separados por comas sin espacios:</p>
                     <input
                         type="text"
@@ -126,7 +124,7 @@ export default function AutomataForm() {
                     </p>
 
                     {transitions.map((str, index) => (
-                        <div key={index} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <div key={index} className="entradas">
                             <input
                                 type="text"
                                 placeholder="q0,a,q1"
@@ -134,35 +132,36 @@ export default function AutomataForm() {
                                 onChange={(e) => updateTransition(index, e.target.value)}
                                 required
                             />
-                            <button type="button" onClick={() => removeTransition(index)} style={{ padding: "5px", backgroundColor: "#dc3545", color: "white", border: "none", cursor: "pointer" }}>
+                            <button className="x" type="button" onClick={() => removeTransition(index)} >
                                 X
                             </button>
                         </div>
                     ))}
 
-                    <button type="button" onClick={addTransition} style={{ padding: "10px", backgroundColor: "#28a745", color: "white", border: "none", cursor: "pointer" }}>
+                    <button className="agregar" type="button" onClick={addTransition}>
                         Agregar transicion
                     </button>
 
                     <h3>Cadenas a evaluar</h3>
                     {strings.map((str, index) => (
-                        <div key={index} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <div key={index} className="entradas">
+                            {index+1}
                             <input
                                 type="text"
                                 placeholder="Ingresar cadena"
                                 value={str}
                                 onChange={(e) => updateString(index, e.target.value)}
                             />
-                            <button type="button" onClick={() => removeString(index)} style={{ padding: "5px", backgroundColor: "#dc3545", color: "white", border: "none", cursor: "pointer" }}>
+                            <button className="x" type="button" onClick={() => removeString(index)} >
                                 X
                             </button>
                         </div>
                     ))}
 
-                    <button type="button" onClick={addString} style={{ padding: "10px", backgroundColor: "#28a745", color: "white", border: "none", cursor: "pointer" }}>
+                    <button className="agregar" type="button" onClick={addString}>
                         Agregar cadena
                     </button>
-                    <button type="submit" style={{ padding: "10px", backgroundColor: "#007bff", color: "white", border: "none", cursor: "pointer" }}>
+                    <button className="evaluar" type="submit">
                         Evaluar
                     </button>
                 </form>
